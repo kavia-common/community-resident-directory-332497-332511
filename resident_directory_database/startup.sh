@@ -154,3 +154,22 @@ echo "To use with Node.js viewer, run: source db_visualizer/postgres.env"
 echo "To connect to the database, use one of the following commands:"
 echo "psql -h localhost -U ${DB_USER} -d ${DB_NAME} -p ${DB_PORT}"
 echo "$(cat db_connection.txt)"
+echo ""
+
+# Optional post-start hooks for local dev: migrations + seed
+# These are OFF by default to preserve existing behavior.
+# Set in .env (or exported in shell) when you want automatic bootstrap:
+#   RUN_MIGRATIONS_ON_STARTUP=true
+#   RUN_SEED_ON_STARTUP=true
+RUN_MIGRATIONS_ON_STARTUP=${RUN_MIGRATIONS_ON_STARTUP:-false}
+RUN_SEED_ON_STARTUP=${RUN_SEED_ON_STARTUP:-false}
+
+if [ "${RUN_MIGRATIONS_ON_STARTUP}" = "true" ]; then
+    echo "Running migrations (scripts/migrate.sh)..."
+    bash ./scripts/migrate.sh
+fi
+
+if [ "${RUN_SEED_ON_STARTUP}" = "true" ]; then
+    echo "Running seed (scripts/seed.sh)..."
+    bash ./scripts/seed.sh
+fi
